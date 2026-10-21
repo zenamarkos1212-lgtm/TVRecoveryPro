@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0B0D10">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0B0D10">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TV RECOVERY PRO"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="12dp"/>
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="USB: Not connected"
+            android:textColor="#66FF66"
+            android:textSize="16sp"
+            android:padding="8dp"/>
+
+        <Spinner
+            android:id="@+id/deviceSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/connectButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AUTO DETECT / CONNECT"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TV / SoC Profile"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:paddingTop="12dp"/>
+
+        <Spinner
+            android:id="@+id/profileSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/baudSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <Spinner
+                android:id="@+id/dataSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/paritySpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <Spinner
+                android:id="@+id/stopSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/scanBaudButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SCAN BAUD"/>
+
+            <Button
+                android:id="@+id/saveLogButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SAVE LOG"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/counters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RX: 0 bytes    TX: 0 bytes"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"/>
+
+        <Button
+            android:id="@+id/openButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OPEN SERIAL"/>
+
+
+        <Button
+            android:id="@+id/selectBinButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SELECT FIRMWARE BIN"/>
+
+        <Button
+            android:id="@+id/analyzeBinButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ANALYZE BIN HEADER"/>
+
+        <TextView
+            android:id="@+id/binInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Firmware: not selected"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"/>
+
+        <ProgressBar
+            android:id="@+id/recoveryProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleHorizontal"/>
+
+        <Button
+            android:id="@+id/probeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SAFE UART PROBE"/>
+
+        <Button
+            android:id="@+id/recoveryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="START PROFILE RECOVERY"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="UART Console"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:paddingTop="12dp"/>
+
+        <TextView
+            android:id="@+id/console"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:background="#050607"
+            android:textColor="#B7FFB7"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:padding="8dp"
+            android:scrollbars="vertical"/>
+
+        <EditText
+            android:id="@+id/sendEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type text or HEX bytes"
+            android:textColor="#FFFFFF"
+            android:hintTextColor="#777777"
+            android:singleLine="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/sendTextButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SEND TEXT"/>
+
+            <Button
+                android:id="@+id/sendHexButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SEND HEX"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CLEAR LOG"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Supported USB serial families: PL2303, CH340/CH341, CP210x, FTDI and CDC ACM. TV recovery commands are profile-specific; the app does not use an activation server."
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:padding="10dp"/>
+    </LinearLayout>
+</ScrollView>
+
+    <VideoView
+        android:id="@+id/introVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000" />
+
+
+</FrameLayout>
