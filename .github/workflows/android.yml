@@ -1,43 +1,82 @@
+cd ~/TVRecoveryPro
+
+mkdir -p .github/workflows
+
+cat > .github/workflows/android.yml <<'EOF'
 name: Build TV Recovery Pro APK
 
 on:
-  workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Build APK
+      - name: Locate Android project
+        id: project
+        shell: bash
         run: |
-          if [ -f ./gradlew ]; then
-            chmod +x ./gradlew
-            ./gradlew assembleDebug
-          elif [ -f ./android/gradlew ]; then
-            cd android
-            chmod +x gradlew
-            ./gradlew assembleDebug
+          set -e
+
+          if [ -f "TVRecoveryPro_RECOVERY_ALL_IN_ONE/gradlew" ]; then
+            echo "dir=TVRecoveryPro_RECOVERY_ALL_IN_ONE" >> "$GITHUB_OUTPUT"
+          elif [ -f "gradlew" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          elif [ -f "android/gradlew" ]; then
+            echo "dir=android" >> "$GITHUB_OUTPUT"
           else
-            echo "Gradle wrapper not found"
-            find . -maxdepth 4 -type f \( -name gradlew -o -name build.gradle -o -name build.gradle.kts \)
+            echo "ERROR: Gradle wrapper not found."
+            echo "Files and Gradle configurations found:"
+            find . -maxdepth 5 -type f \( \
+              -name gradlew -o \
+              -name settings.gradle -o \
+              -name settings.gradle.kts -o \
+              -name build.gradle -o \
+              -name build.gradle.kts \
+            \)
             exit 1
           fi
+
+      - name: Build Debug APK
+        shell: bash
+        run: |
+          set -e
+          PROJECT="${{ steps.project.outputs.dir }}"
+          echo "Android project directory: $PROJECT"
+
+          cd "$PROJECT"
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: TVRecoveryPro-APK
           path: |
-            **/build/outputs/apk/debug/*.apk
+            TVRecoveryPro_RECOVERY_ALL_IN_ONE/app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          retention-days: 14
+EOF
+
+echo "Workflow file created:"
+cat .github/workflows/android.ym
