@@ -286,8 +286,8 @@ class MainActivity : AppCompatActivity() {
                 try {
                     current.setParameters(
                         b,
-                        UsbSerialPort.DATA_BITS_8,
-                        UsbSerialPort.STOP_BITS_1,
+                        8,
+                        1,
                         UsbSerialPort.PARITY_NONE
                     )
                     Thread.sleep(500)
