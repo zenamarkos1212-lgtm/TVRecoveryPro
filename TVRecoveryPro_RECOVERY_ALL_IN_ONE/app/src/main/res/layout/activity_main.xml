@@ -194,7 +194,7 @@
             android:layout_height="wrap_content"
             android:hint="Type text or HEX bytes"
             android:textColor="#FFFFFF"
-            android:hintTextColor="#777777"
+            android:textColorHint="#777777"
             android:singleLine="true"/>
 
         <LinearLayout
