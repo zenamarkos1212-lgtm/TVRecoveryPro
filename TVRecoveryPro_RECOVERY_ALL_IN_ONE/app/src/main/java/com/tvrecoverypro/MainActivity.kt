@@ -1,7 +1,4 @@
-detectDevices()
-
-c
-cpackage com.tvrecoverypro
+package com.tvrecoverypro
 
 import android.app.PendingIntent
 import android.content.*
@@ -72,25 +69,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Play the bundled NewTech intro video over the main screen on launch.
-        val introVideo = findViewById<VideoView>(R.id.introVideo)
-        fun finishIntro() {
-            if (introVideo.visibility != android.view.View.GONE) {
-                introVideo.stopPlayback()
-                introVideo.visibility = android.view.View.GONE
-            }
-        }
-        introVideo.setVideoURI(Uri.parse("android.resource://$packageName/${R.raw.intro_video}"))
-        introVideo.setOnCompletionListener { finishIntro() }
-        introVideo.setOnErrorListener { _, _, _ ->
-            finishIntro()
-            true
-        }
-        introVideo.setOnPreparedListener { player ->
-            player.isLooping = false
-            introVideo.start()
-        }
-
         usbManager = getSystemService(USB_SERVICE) as UsbManager
 
         deviceSpinner = findViewById(R.id.deviceSpinner)
@@ -128,7 +106,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.probeButton).setOnClickListener { safeProbe() }
         findViewById<Button>(R.id.recoveryButton).setOnClickListener { startProfileRecovery() }
 
-        detectDevices()
+        ActivationManager.requireActivation(this) {
+            detectDevices()
+        }
     }
 
     private fun setupSpinners() {
@@ -290,7 +270,7 @@ class MainActivity : AppCompatActivity() {
                     current.setParameters(
                         b,
                         8,
-                        1,
+                        UsbSerialPort.STOPBITS_1,
                         UsbSerialPort.PARITY_NONE
                     )
                     Thread.sleep(500)

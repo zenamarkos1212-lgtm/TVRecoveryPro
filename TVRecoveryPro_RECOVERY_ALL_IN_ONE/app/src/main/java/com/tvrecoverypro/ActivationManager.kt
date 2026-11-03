@@ -2,10 +2,11 @@ package com.tvrecoverypro
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.provider.Settings
 import android.util.Base64
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -14,11 +15,13 @@ import java.security.KeyFactory
 import java.security.Signature
 import java.security.spec.X509EncodedKeySpec
 
+/**
+ * Offline RSA-signed activation.
+ * The admin private key must remain outside this application.
+ */
 object ActivationManager {
-
     private const val PREFS = "tvrecovery_license"
-    private const val DAYS = 365L
-    private const val DAY_MS = 24L * 60L * 60L * 1000L
+    private const val VALIDITY_MS = 365L * 24L * 60L * 60L * 1000L
 
     private const val PUBLIC_KEY =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoG4VHYvcSeagFCrLHy18" +
@@ -30,29 +33,25 @@ object ActivationManager {
         "1QIDAQAB"
 
     fun deviceId(context: Context): String =
-        Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ANDROID_ID
-        ) ?: "UNKNOWN"
+        Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            ?: "UNKNOWN"
 
-    private fun verifyKey(key: String, id: String): Boolean {
+    private fun verifyKey(key: String, deviceId: String): Boolean {
         return try {
             val parts = key.trim().split(".")
             if (parts.size != 2) return false
 
-            val decoder = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
-            val payload = Base64.decode(parts[0], decoder)
-            val signatureBytes = Base64.decode(parts[1], decoder)
-
-            val text = String(payload, Charsets.UTF_8)
-            val fields = text.split("|")
-            if (fields.size != 3) return false
-            if (fields[0] != id || fields[1] != "365") return false
+            val flags = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+            val payload = Base64.decode(parts[0], flags)
+            val signatureBytes = Base64.decode(parts[1], flags)
+            val fields = String(payload, Charsets.UTF_8).split("|")
+            if (fields.size != 3 || fields[0] != deviceId || fields[1] != "365") {
+                return false
+            }
 
             val publicBytes = Base64.decode(PUBLIC_KEY, Base64.DEFAULT)
             val publicKey = KeyFactory.getInstance("RSA")
                 .generatePublic(X509EncodedKeySpec(publicBytes))
-
             val verifier = Signature.getInstance("SHA256withRSA")
             verifier.initVerify(publicKey)
             verifier.update(payload)
@@ -69,7 +68,7 @@ object ActivationManager {
         val now = System.currentTimeMillis()
 
         if (start <= 0L || last <= 0L || now < last) return false
-        if (now >= start + DAYS * DAY_MS) return false
+        if (now >= start + VALIDITY_MS) return false
 
         prefs.edit().putLong("last_seen", now).apply()
         return true
@@ -86,31 +85,24 @@ object ActivationManager {
             orientation = LinearLayout.VERTICAL
             setPadding(40, 24, 40, 8)
         }
-
         val info = TextView(activity).apply {
-            text = "TVRecoveryPro Offline Activation\n\nDevice ID:\n$id\n\nValidity: 365 days from activation"
+            text = "TVRecoveryPro Offline Activation\\n\\nDevice ID:\\n$id\\n\\nValidity: 365 days from activation"
         }
-
-        val input = EditText(activity).apply {
+        val copyButton = Button(activity).apply {
+            text = "COPY DEVICE ID"
+            setOnClickListener {
+                val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("Device ID", id))
+            }
+        }
+        val keyInput = EditText(activity).apply {
             hint = "Paste Activation Key"
             minLines = 2
             maxLines = 4
         }
-
-        val copy = Button(activity).apply {
-            text = "COPY DEVICE ID"
-            setOnClickListener {
-                val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE)
-                    as android.content.ClipboardManager
-                clipboard.setPrimaryClip(
-                    android.content.ClipData.newPlainText("Device ID", id)
-                )
-            }
-        }
-
         layout.addView(info)
-        layout.addView(copy)
-        layout.addView(input)
+        layout.addView(copyButton)
+        layout.addView(keyInput)
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle("ACTIVATE TV RECOVERY PRO")
@@ -121,23 +113,19 @@ object ActivationManager {
 
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                if (!verifyKey(input.text.toString(), id)) {
-                    input.error = "Invalid key or key belongs to another device"
+                if (!verifyKey(keyInput.text.toString(), id)) {
+                    keyInput.error = "Invalid key or key belongs to another device"
                     return@setOnClickListener
                 }
-
                 val now = System.currentTimeMillis()
-                activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                    .edit()
+                activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
                     .putLong("activated_at", now)
                     .putLong("last_seen", now)
                     .apply()
-
                 dialog.dismiss()
                 onActivated()
             }
         }
-
         dialog.show()
     }
 }
