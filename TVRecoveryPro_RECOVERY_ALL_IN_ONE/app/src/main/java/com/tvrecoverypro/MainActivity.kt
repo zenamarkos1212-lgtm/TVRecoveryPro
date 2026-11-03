@@ -1,4 +1,7 @@
-package com.tvrecoverypro
+detectDevices()
+
+c
+cpackage com.tvrecoverypro
 
 import android.app.PendingIntent
 import android.content.*

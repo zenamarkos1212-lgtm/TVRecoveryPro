@@ -1,0 +1,1 @@
+This project is an original starter application created for the user. It is not a copy of GKC Terminal Pro and does not include proprietary activation logic, keys, firmware databases, or private protocols.
